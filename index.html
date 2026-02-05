@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Message</title>
+    <style>
+        :root {
+            --primary-pink: #ff4d6d;
+            --soft-pink: #ffccd5;
+            --dark-gray: #4a4a4a;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial Rounded MT Bold', 'Helvetica', sans-serif;
+            background-color: var(--soft-pink);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Envelope Styling */
+        #envelope-wrapper {
+            cursor: pointer;
+            text-align: center;
+            z-index: 20;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .envelope-icon {
+            font-size: 100px;
+            display: block;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .open-me-text {
+            color: white;
+            background: var(--primary-pink);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Card Styling */
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            z-index: 10;
+            max-width: 320px;
+            width: 85%;
+            position: absolute;
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+
+        h1 { color: var(--primary-pink); font-size: 1.6rem; margin-bottom: 20px; }
+        p { color: var(--dark-gray); line-height: 1.5; font-size: 1rem; }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        #yesBtn { background: #4caf50; color: white; }
+        #noBtn { background: #ff4d6d; color: white; }
+        #retryBtn { background: var(--primary-pink); color: white; margin: 20px auto 0; }
+
+        .hidden { display: none; }
+
+        .heart, .raindrop {
+            position: absolute;
+            top: -20px;
+            pointer-events: none;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(110vh); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div id="envelope-wrapper" onclick="openEnvelope()">
+        <div class="envelope-icon">✉️</div>
+        <div class="open-me-text">You have a message! Open me</div>
+    </div>
+
+    <div class="card" id="mainCard">
+        <div id="questionScreen">
+            <div style="font-size: 50px;">💝</div>
+            <h1>Will you be my Valentine?</h1>
+            <div class="btn-group">
+                <button id="yesBtn" onclick="celebrate()">Yes</button>
+                <button id="noBtn" onclick="reject()">No</button>
+            </div>
+        </div>
+
+        <div id="errorScreen" class="hidden">
+            <div style="font-size: 50px;">⚠️</div>
+            <h1 style="color: #d32f2f;">System Error</h1>
+            <p>Oops! "No" is not a valid answer in this relationship. Please try again.</p>
+            <button id="retryBtn" onclick="resetPage()">Retry</button>
+        </div>
+
+        <div id="successScreen" class="hidden">
+            <div style="font-size: 50px;">🥰</div>
+            <h1>Yay! ❤️</h1>
+            <p>I knew you'd say yes! You make me the luckiest person in the world. I can't wait to spend the 14th with you!</p>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('canvas-container');
+        const envelope = document.getElementById('envelope-wrapper');
+        const card = document.getElementById('mainCard');
+
+        function openEnvelope() {
+            envelope.style.opacity = '0';
+            envelope.style.transform = 'scale(0.5)';
+            setTimeout(() => {
+                envelope.classList.add('hidden');
+                card.classList.add('active');
+            }, 500);
+        }
+
+        function createParticle(char, color, className) {
+            const particle = document.createElement('div');
+            particle.innerHTML = char;
+            particle.className = className;
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.fontSize = Math.random() * 20 + 15 + 'px';
+            particle.style.animationDuration = Math.random() * 2 + 2 + 's';
+            particle.style.color = color;
+            container.appendChild(particle);
+            setTimeout(() => particle.remove(), 4000);
+        }
+
+        function celebrate() {
+            document.getElementById('questionScreen').classList.add('hidden');
+            document.getElementById('successScreen').classList.remove('hidden');
+            document.body.style.backgroundColor = "#ffebf0";
+            window.heartInterval = setInterval(() => createParticle('❤️', '#ff4d6d', 'heart'), 150);
+        }
+
+        function reject() {
+            document.getElementById('questionScreen').classList.add('hidden');
+            document.getElementById('errorScreen').classList.remove('hidden');
+            document.body.style.backgroundColor = "#cfd8dc";
+            window.rainInterval = setInterval(() => createParticle('💧', '#1976d2', 'raindrop'), 60);
+        }
+
+        function resetPage() {
+            clearInterval(window.rainInterval);
+            document.getElementById('errorScreen').classList.add('hidden');
+            document.getElementById('questionScreen').classList.remove('hidden');
+            document.body.style.backgroundColor = "#ffccd5";
+            container.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
